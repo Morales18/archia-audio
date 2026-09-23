@@ -39,11 +39,13 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             REQUEST="${{ inputs.request }}"
           else
-            REQUEST="$(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}" | grep '^requests/.*\.json$' | tail -n 1)"
+            REQUEST="$(git show --pretty="" --name-only "${{ github.sha }}" | grep '^requests/.*\.json$' | tail -n 1 || true)"
             if [ -z "$REQUEST" ]; then
-              REQUEST="requests/B03.json"
+              REQUEST="$(find requests -maxdepth 1 -type f -name '*.json' | sort | tail -n 1)"
             fi
           fi
+          test -n "$REQUEST"
+          test -f "$REQUEST"
           echo "path=$REQUEST" >> "$GITHUB_OUTPUT"
           echo "Using request: $REQUEST"
 
