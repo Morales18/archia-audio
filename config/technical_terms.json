@@ -307,7 +307,17 @@
     "network sandbox",
     "process cleanup",
     "timeout",
-    "provider attestation"
+    "provider attestation",
+    "Orchestrator",
+    "Engineer",
+    "Reviewer",
+    "Validator",
+    "validate",
+    "validated",
+    "validation",
+    "exactly once",
+    "reconciliation",
+    "idempotency"
   ],
   "aliases": {
     "ArchIA": "Arquia"
@@ -318,12 +328,12 @@
     "Quality Evidence": "cuóliti évidens",
     "Quality Verdict": "cuóliti vérdict",
     "Validation Contract": "validéishon cóntract",
-    "Agent Runtime": "éiyent rántime",
+    "Agent Runtime": "éiyent rán táim",
     "Agent Profile": "éiyent próufail",
     "Agent Profiles": "éiyent próufails",
     "Effective Profile": "iféctiv próufail",
-    "Intelligent Runtime Port": "intéliyent rántime port",
-    "Agent Execution Spec": "éiyent execiúshon spec",
+    "Intelligent Runtime Port": "intéliyent rán táim port",
+    "Agent Execution Spec": "éiyent exekiúshon spék",
     "Execution Receipt": "execiúshon risít",
     "Execution Receipts": "execiúshon risíts",
     "Requirement Intake": "ricuáiarment inteik",
@@ -373,8 +383,8 @@
     "unit test": "iúunit test",
     "retry": "ritrái",
     "retries": "ritráis",
-    "checkpoint": "chékpoint",
-    "checkpoints": "chékpoints",
+    "checkpoint": "chék póint",
+    "checkpoints": "chék póints",
     "receipt": "risít",
     "receipts": "risíts",
     "workspace": "uórkspéis",
@@ -613,6 +623,16 @@
     "network sandbox": "nétuork sándbox",
     "process cleanup": "próuses clínap",
     "timeout": "táimaut",
-    "provider attestation": "prováider atestéishon"
+    "provider attestation": "prováider atestéishon",
+    "Orchestrator": "orquestador",
+    "Engineer": "endyinír",
+    "Reviewer": "riviúer",
+    "Validator": "válideitor",
+    "validate": "válideit",
+    "validated": "válideitid",
+    "validation": "validéishon",
+    "exactly once": "igzáctli uáns",
+    "reconciliation": "rekonsiliéishon",
+    "idempotency": "aidempótensi"
   }
 }
