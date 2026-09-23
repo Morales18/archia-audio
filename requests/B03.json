@@ -17,12 +17,12 @@
       "text": "Cerramos B3 con una separación que conviene tener muy clara.\n\nUn Quality Verdict con ACCEPT significa que la evidencia cumple el contrato de calidad.\n\nPero no significa automáticamente que todo el workflow esté aprobado.\n\nY tampoco significa que podamos hacer un release.\n\n¿Por qué?\n\nPorque cada componente tiene su propia autoridad.\n\nC11, el Quality Engine, decide sobre calidad.\n\nC04, el Orchestrator, controla el lifecycle de la tarea y del workflow.\n\nY más adelante, el Delivery Manager decidirá si algo puede promocionarse o desplegarse.\n\nEsto evita que una sola pieza tenga demasiado poder.\n\nTambién aparece aquí la relación con los execution receipts.\n\nSi una evidencia afirma que ocurrió un efecto real, por ejemplo que una acción se ejecutó sobre un workspace, necesitamos poder correlacionarla con un receipt.\n\nNo basta con un log diciendo que algo parecía haber ocurrido.\n\nY la observabilidad tampoco puede convertirse en autoridad.\n\nLos traces y eventos ayudan a entender lo que pasó, pero por sí solos no pueden aprobar una Quality Gate.\n\nAsí que B3 introduce una idea muy importante para toda ArchIA: una afirmación necesita evidencia suficiente, actual y correctamente ligada a la ejecución que estamos evaluando.\n\nSi falta, el resultado será INCOMPLETE o REJECT.\n\nNo ACCEPT por aproximación.\n\nQuédate con esta frase:\n\nEl Quality Engine no pregunta si el agente parece haber hecho un buen trabajo. Comprueba si existe evidencia suficiente para demostrarlo.\n\nEn B4 cambiaremos de tema y entraremos en contexto, memoria y conocimiento: cómo consigue un agente exactamente la información que necesita sin cargar medio repositorio en cada prompt."
     }
   ],
-  "revision": 3,
+  "revision": 4,
   "provider": "auto",
   "english_locale": "en-GB",
   "paragraph_pause_ms": 150,
   "azure_voice": "es-ES-XimenaMultilingualNeural",
-  "edge_voice": "es-ES-XimenaMultilingualNeural",
+  "edge_voice": "es-ES-XimenaNeural",
   "azure_output_format": "audio-48khz-192kbitrate-mono-mp3",
   "glossary": "config/technical_terms.json"
 }
