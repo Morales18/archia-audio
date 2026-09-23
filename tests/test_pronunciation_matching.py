@@ -42,5 +42,20 @@ class PronunciationMatchingTests(unittest.TestCase):
         self.assertIn('<lang xml:lang="en-GB">CI</lang>', rendered)
 
 
+    def test_explicit_spoken_alias_overrides_english_term(self):
+        rendered = module.render_mixed_language_text(
+            "El Orchestrator llama al Agent Runtime.",
+            english_terms=["Orchestrator", "Agent Runtime"],
+            aliases={
+                "Orchestrator": "orquestador",
+                "Agent Runtime": "runtime de agentes",
+            },
+            english_locale="en-GB",
+        )
+        self.assertIn('<sub alias="orquestador">Orchestrator</sub>', rendered)
+        self.assertIn('<sub alias="runtime de agentes">Agent Runtime</sub>', rendered)
+        self.assertNotIn('<lang xml:lang="en-GB">Orchestrator</lang>', rendered)
+
+
 if __name__ == "__main__":
     unittest.main()
