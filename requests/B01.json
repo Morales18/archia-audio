@@ -10,7 +10,7 @@
   "edge_voice": "es-ES-XimenaNeural",
   "azure_output_format": "audio-48khz-192kbitrate-mono-mp3",
   "glossary": "config/technical_terms.json",
-  "revision": 2,
+  "revision": 3,
   "chapters": [
     {
       "title": "De la intención al plan",
