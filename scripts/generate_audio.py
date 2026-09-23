@@ -50,7 +50,7 @@ def load_request(path: Path) -> dict[str, Any]:
 
 def load_glossary(path: Path) -> dict[str, Any]:
     if not path.exists():
-        return {"english_terms": [], "aliases": {}}
+        return {"english_terms": [], "aliases": {}, "edge_aliases": {}}
     data = json.loads(path.read_text(encoding="utf-8"))
     return {
         "english_terms": sorted(
@@ -59,6 +59,9 @@ def load_glossary(path: Path) -> dict[str, Any]:
             reverse=True,
         ),
         "aliases": {str(k): str(v) for k, v in data.get("aliases", {}).items()},
+        "edge_aliases": {
+            str(k): str(v) for k, v in data.get("edge_aliases", {}).items()
+        },
     }
 
 
@@ -190,6 +193,20 @@ def synthesize_azure(
         raise RuntimeError(
             f"Azure Speech failed with HTTP {exc.code}: {detail}"
         ) from exc
+
+
+
+def apply_edge_aliases(text: str, aliases: dict[str, str]) -> str:
+    result = text
+    for source in sorted(aliases, key=len, reverse=True):
+        replacement = aliases[source]
+        result = re.sub(
+            re.escape(source),
+            replacement,
+            result,
+            flags=re.IGNORECASE,
+        )
+    return result
 
 
 async def choose_edge_voice(locale: str, preferred: str | None = None) -> str:
@@ -345,8 +362,12 @@ async def main() -> None:
                     output_format=azure_output_format,
                 )
             else:
-                await synthesize_edge(
+                edge_text = apply_edge_aliases(
                     text,
+                    glossary.get("edge_aliases", {}),
+                )
+                await synthesize_edge(
+                    edge_text,
                     raw_path,
                     voice=edge_voice,
                     rate=rate,
