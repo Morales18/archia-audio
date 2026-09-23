@@ -16,8 +16,9 @@ from typing import Any
 import edge_tts
 
 EDGE_VOICE_PRIORITY = [
-    "es-ES-TristanMultilingualNeural",
     "es-ES-XimenaMultilingualNeural",
+    "es-ES-IsidoraMultilingualNeural",
+    "es-ES-TristanMultilingualNeural",
     "es-ES-AlvaroNeural",
     "es-ES-ElviraNeural",
 ]
@@ -191,9 +192,11 @@ def synthesize_azure(
         ) from exc
 
 
-async def choose_edge_voice(locale: str) -> str:
+async def choose_edge_voice(locale: str, preferred: str | None = None) -> str:
     voices = await edge_tts.list_voices()
     available = {v["ShortName"] for v in voices if v.get("Locale") == locale}
+    if preferred and preferred in available:
+        return preferred
     for candidate in EDGE_VOICE_PRIORITY:
         if candidate in available:
             return candidate
@@ -275,9 +278,10 @@ async def main() -> None:
     actual_provider, fallback_used = select_provider(payload)
 
     azure_voice = payload.get("azure_voice", DEFAULT_AZURE_VOICE)
+    preferred_edge_voice = payload.get("edge_voice")
     edge_voice = "DRY_RUN"
     if not args.dry_run and actual_provider == "edge":
-        edge_voice = await choose_edge_voice(locale)
+        edge_voice = await choose_edge_voice(locale, preferred_edge_voice)
 
     out_dir = Path("dist") / block
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -292,6 +296,7 @@ async def main() -> None:
         "provider": actual_provider if not args.dry_run else "DRY_RUN",
         "fallback_used": fallback_used,
         "azure_voice": azure_voice,
+        "preferred_edge_voice": preferred_edge_voice,
         "edge_voice": edge_voice,
         "chapters": [],
     }
