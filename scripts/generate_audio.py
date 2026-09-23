@@ -83,7 +83,10 @@ def render_mixed_language_text(
         return html.escape(text)
 
     pattern = re.compile(
-        "|".join(f"({re.escape(token)})" for token, _ in tokens),
+        "|".join(
+            rf"(?<!\\w){re.escape(token)}(?!\\w)"
+            for token, _ in tokens
+        ),
         flags=re.IGNORECASE,
     )
 
@@ -200,12 +203,11 @@ def apply_edge_aliases(text: str, aliases: dict[str, str]) -> str:
     result = text
     for source in sorted(aliases, key=len, reverse=True):
         replacement = aliases[source]
-        result = re.sub(
-            re.escape(source),
-            replacement,
-            result,
+        pattern = re.compile(
+            rf"(?<!\\w){re.escape(source)}(?!\\w)",
             flags=re.IGNORECASE,
         )
+        result = pattern.sub(replacement, result)
     return result
 
 
