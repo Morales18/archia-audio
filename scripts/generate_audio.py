@@ -84,7 +84,7 @@ def render_mixed_language_text(
 
     pattern = re.compile(
         "|".join(
-            rf"(?<!\\w){re.escape(token)}(?!\\w)"
+            rf"(?<!\w){re.escape(token)}(?!\w)"
             for token, _ in tokens
         ),
         flags=re.IGNORECASE,
@@ -204,7 +204,7 @@ def apply_edge_aliases(text: str, aliases: dict[str, str]) -> str:
     for source in sorted(aliases, key=len, reverse=True):
         replacement = aliases[source]
         pattern = re.compile(
-            rf"(?<!\\w){re.escape(source)}(?!\\w)",
+            rf"(?<!\w){re.escape(source)}(?!\w)",
             flags=re.IGNORECASE,
         )
         result = pattern.sub(replacement, result)
