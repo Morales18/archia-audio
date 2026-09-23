@@ -273,7 +273,7 @@ def create_complete_audio(chapter_files: list[Path], destination: Path) -> str:
     concat_file = destination.parent / ".concat.txt"
     concat_file.write_text(
         "".join(
-            f"file '{p.resolve().as_posix().replace("'", "'\\''")}'\\n"
+            f"file '{p.resolve().as_posix()}'\n"
             for p in chapter_files
         ),
         encoding="utf-8",
