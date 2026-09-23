@@ -1,0 +1,59 @@
+name: Generate ArchIA podcast
+
+on:
+  push:
+    paths:
+      - "requests/*.json"
+      - "scripts/generate_audio.py"
+      - "requirements.txt"
+  workflow_dispatch:
+    inputs:
+      request:
+        description: "Request JSON path"
+        required: true
+        default: "requests/B03.json"
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Select request
+        id: request
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            REQUEST="${{ inputs.request }}"
+          else
+            REQUEST="$(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}" | grep '^requests/.*\.json$' | tail -n 1)"
+            if [ -z "$REQUEST" ]; then
+              REQUEST="requests/B03.json"
+            fi
+          fi
+          echo "path=$REQUEST" >> "$GITHUB_OUTPUT"
+          echo "Using request: $REQUEST"
+
+      - name: Generate MP3
+        run: python scripts/generate_audio.py "${{ steps.request.outputs.path }}"
+
+      - name: Upload podcast artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: archia-podcast-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
