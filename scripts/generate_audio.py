@@ -72,13 +72,14 @@ def render_mixed_language_text(
     aliases: dict[str, str],
     english_locale: str,
 ) -> str:
-    tokens: list[tuple[str, str]] = []
-    for source, alias in aliases.items():
-        tokens.append((source, "alias"))
+    token_map: dict[str, tuple[str, str]] = {}
     for term in english_terms:
-        tokens.append((term, "english"))
+        token_map[term.casefold()] = (term, "english")
+    for source in aliases:
+        # Explicit spoken aliases override generic English pronunciation.
+        token_map[source.casefold()] = (source, "alias")
 
-    tokens.sort(key=lambda item: len(item[0]), reverse=True)
+    tokens = sorted(token_map.values(), key=lambda item: len(item[0]), reverse=True)
     if not tokens:
         return html.escape(text)
 
@@ -90,7 +91,7 @@ def render_mixed_language_text(
         flags=re.IGNORECASE,
     )
 
-    token_map = {token.casefold(): kind for token, kind in tokens}
+    kind_map = {token.casefold(): kind for token, kind in tokens}
     alias_map = {source.casefold(): alias for source, alias in aliases.items()}
 
     out: list[str] = []
@@ -98,7 +99,7 @@ def render_mixed_language_text(
     for match in pattern.finditer(text):
         out.append(html.escape(text[last:match.start()]))
         raw = match.group(0)
-        kind = token_map.get(raw.casefold(), "english")
+        kind = kind_map.get(raw.casefold(), "english")
         if kind == "alias":
             alias = html.escape(alias_map[raw.casefold()], quote=True)
             out.append(f'<sub alias="{alias}">{html.escape(raw)}</sub>')
