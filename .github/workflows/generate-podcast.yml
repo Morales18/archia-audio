@@ -50,7 +50,22 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             REQUEST="${{ inputs.request }}"
           else
-            REQUEST="$(git show --pretty="" --name-only "${{ github.sha }}" | grep '^requests/.*\.json$' | tail -n 1 || true)"
+            REQUEST="$(python - <<'PY'
+import json
+import os
+
+with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as fh:
+    event = json.load(fh)
+
+head = event.get("head_commit") or {}
+candidates = list(head.get("added") or []) + list(head.get("modified") or [])
+matches = [
+    path for path in candidates
+    if path.startswith("requests/") and path.endswith(".json")
+]
+print(matches[-1] if matches else "")
+PY
+)"
             if [ -z "$REQUEST" ]; then
               REQUEST="$(find requests -maxdepth 1 -type f -name '*.json' | sort | tail -n 1)"
             fi
