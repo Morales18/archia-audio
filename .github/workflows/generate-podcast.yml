@@ -15,7 +15,7 @@ on:
         default: "requests/B03.json"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   generate:
@@ -23,6 +23,7 @@ jobs:
     env:
       AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
       AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Checkout
@@ -56,8 +57,11 @@ jobs:
           fi
           test -n "$REQUEST"
           test -f "$REQUEST"
+          BLOCK="$(python -c 'import json,sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["block"])' "$REQUEST")"
           echo "path=$REQUEST" >> "$GITHUB_OUTPUT"
+          echo "block=$BLOCK" >> "$GITHUB_OUTPUT"
           echo "Using request: $REQUEST"
+          echo "Block: $BLOCK"
 
       - name: Show provider availability
         shell: bash
@@ -78,3 +82,19 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish complete block to permanent course release
+        shell: bash
+        run: |
+          TAG="archia-course-audio-v1"
+          BLOCK="${{ steps.request.outputs.block }}"
+          FULL_AUDIO="dist/$BLOCK/$BLOCK-completo.mp3"
+
+          test -f "$FULL_AUDIO"
+
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG"               --title "ArchIA — Curso de audio"               --notes "Biblioteca permanente de los bloques completos del curso técnico de ArchIA. Los assets Bxx-completo.mp3 son los audios oficiales para escuchar cada bloque de principio a fin."
+          fi
+
+          gh release upload "$TAG" "$FULL_AUDIO" --clobber
+          echo "Published: $FULL_AUDIO"
