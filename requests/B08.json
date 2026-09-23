@@ -1,0 +1,28 @@
+{
+  "block": "B08",
+  "locale": "es-ES",
+  "rate": "+0%",
+  "style": "castellano de España, velocidad natural, tono conversacional y términos técnicos pronunciados de forma natural",
+  "provider": "auto",
+  "english_locale": "en-GB",
+  "paragraph_pause_ms": 150,
+  "azure_voice": "es-ES-XimenaMultilingualNeural",
+  "edge_voice": "es-ES-XimenaNeural",
+  "azure_output_format": "audio-48khz-192kbitrate-mono-mp3",
+  "glossary": "config/technical_terms.json",
+  "revision": 1,
+  "chapters": [
+    {
+      "title": "C20 integra ArchIA con el SDLC real",
+      "text": "Bienvenido al bloque ocho, el último bloque del curso de arquitectura de ArchIA.\n\nHasta ahora hemos llegado hasta un resultado validado.\n\nPero en un ciclo de desarrollo real todavía falta integrarlo con Git, GitHub, integración continua y los sistemas de entrega.\n\nAhí entra C20, la capa de integración con el ciclo de vida del software.\n\nLa idea fundamental vuelve a ser provider neutrality.\n\nArchIA no debería asumir que todo proyecto usa GitHub para siempre.\n\nGitHub puede ser el primer proveedor.\n\nPero el core trabaja con ports propios.\n\nEso significa que operaciones como preparar cambios, consultar estado de integración continua o coordinar una Pull Request deben estar detrás de adapters.\n\nAsí evitamos que objetos internos de GitHub entren en los contratos canónicos.\n\nTambién separamos coordinación de autoridad.\n\nC20 puede obtener evidencia de un proveedor.\n\nPor ejemplo, que una build terminó correctamente o que existe una revisión concreta.\n\nPero esa evidencia no puede aprobar una release por sí sola.\n\nEl proveedor informa.\n\nArchIA decide.\n\nEsto es importante porque un Pull Request merged no significa automáticamente que el software esté listo para producción.\n\nPuede faltar evidencia de calidad, seguridad, artefactos o aprobación.\n\nPor eso C20 conecta ArchIA con el SDLC externo, pero no se convierte en el dueño del release.\n\nEse papel pertenece a C21."
+    },
+    {
+      "title": "Delivery Manager y Release Gate",
+      "text": "Vamos con la segunda parte de B8: C21, el Delivery Manager, o gestor de entrega.\n\nC21 recibe un resultado que ya ha pasado por calidad y construye una intención de entrega.\n\nEl primer elemento es el Delivery Plan, o plan de entrega.\n\nEse plan referencia la revisión exacta, el conjunto de cambios y el Quality Verdict que autorizó continuar.\n\nDespués tenemos el ChangeSet, el conjunto de cambios.\n\nEs una representación inmutable de los artefactos y revisiones que queremos entregar.\n\nA continuación llega Delivery Evidence.\n\nPuede incluir resultados de integración continua, artefactos construidos, comprobaciones adicionales o evidencia procedente de C20.\n\nPero, otra vez, la evidencia no es la decisión.\n\nEl Release Gate evalúa esa evidencia de forma determinista.\n\nY produce un Release Verdict.\n\nSolo ese veredicto representa la decisión de release dentro de C21.\n\nDespués puede existir un Delivery Receipt, un comprobante que describe el resultado de la operación.\n\nEsto mantiene la misma filosofía que hemos visto durante todo el curso.\n\nUn proveedor no se autoriza a sí mismo.\n\nUna evidencia no se convierte automáticamente en decisión.\n\nY una decisión pertenece a un componente concreto.\n\nTambién permite una estrategia importante: construir una vez y promocionar varias.\n\nEn lugar de recompilar algo distinto para cada entorno, conservamos el mismo artefacto inmutable y lo promocionamos entre stages con evidencia y políticas distintas.\n\nEso mejora trazabilidad y reduce diferencias inesperadas entre entornos."
+    },
+    {
+      "title": "Qué existe hoy y cómo cierra el ciclo ArchIA",
+      "text": "Cerramos B8 distinguiendo claramente arquitectura objetivo y estado actual.\n\nC21 ya tiene contratos canónicos para Delivery Plan, ChangeSet, Delivery Evidence, Release Verdict y Delivery Receipt.\n\nTambién hemos validado un Release Gate determinista.\n\nPero el Delivery Receipt actual es simulado.\n\nLa arquitectura lo marca explícitamente como solo simulado.\n\nEso significa que todavía no estamos afirmando que ArchIA despliegue realmente a producción.\n\nGitHub real, mutaciones de integración continua, deployment, promoción y rollback siguen siendo pasos posteriores que necesitan su propia cualificación.\n\nEsto es importante porque ArchIA intenta ser precisa incluso cuando todavía falta producto.\n\nNo convertimos una simulación correcta en una afirmación de producción.\n\nY con esto podemos recorrer toda la plataforma de principio a fin.\n\nUna petición entra por Requirement Intake.\n\nEl Planner razona.\n\nEl compilador de planes construye las tareas.\n\nEl orquestador controla su ciclo de vida.\n\nEl Knowledge Fabric mantiene el conocimiento y el motor de contexto prepara lo necesario.\n\nLas capabilities describen qué necesita la tarea y las skills aportan capacidades concretas.\n\nEl runtime de agentes realiza el trabajo cognitivo.\n\nEl perímetro de tools gobierna los efectos reales.\n\nEl motor de calidad exige evidencia.\n\nEl plano de control conserva el estado operativo.\n\nLa observabilidad reconstruye lo sucedido y permite medir coste y rendimiento.\n\nY finalmente C20 y C21 conectan el cambio aceptado con el proceso de entrega y release.\n\nEse es el recorrido completo de ArchIA.\n\nNo es un único superagente.\n\nEs una arquitectura de responsabilidades separadas, contratos explícitos y autoridades claras.\n\nY el principio que une todo el curso sigue siendo el mismo:\n\nUsar inteligencia donde necesitamos inteligencia.\n\nY utilizar software determinista en todos los lugares donde necesitamos garantías."
+    }
+  ]
+}
