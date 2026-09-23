@@ -261,6 +261,51 @@ def postprocess_audio(source: Path, destination: Path) -> str:
     return "ffmpeg_loudnorm_48khz_192kbps"
 
 
+
+def create_complete_audio(chapter_files: list[Path], destination: Path) -> str:
+    if not chapter_files:
+        raise ValueError("No chapter audio files to concatenate")
+
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise RuntimeError("ffmpeg is required to create the complete block audio")
+
+    concat_file = destination.parent / ".concat.txt"
+    concat_file.write_text(
+        "".join(
+            f"file '{p.resolve().as_posix().replace("'", "'\\''")}'\\n"
+            for p in chapter_files
+        ),
+        encoding="utf-8",
+    )
+
+    command = [
+        ffmpeg,
+        "-y",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        str(concat_file),
+        "-c:a",
+        "libmp3lame",
+        "-b:a",
+        "192k",
+        "-ar",
+        "48000",
+        "-ac",
+        "1",
+        str(destination),
+    ]
+    subprocess.run(command, check=True)
+    concat_file.unlink(missing_ok=True)
+    return "ffmpeg_concat_48khz_192kbps"
+
+
 def select_provider(payload: dict[str, Any]) -> tuple[str, bool]:
     requested = str(payload.get("provider", "auto")).lower()
     has_azure = bool(
@@ -325,6 +370,8 @@ async def main() -> None:
         "audio-48khz-192kbitrate-mono-mp3",
     )
 
+    chapter_audio_files: list[Path] = []
+
     for index, chapter in enumerate(payload["chapters"], start=1):
         title = chapter["title"].strip()
         text = chapter["text"].strip()
@@ -375,6 +422,7 @@ async def main() -> None:
 
             postprocess = postprocess_audio(raw_path, final_path)
             raw_path.unlink(missing_ok=True)
+            chapter_audio_files.append(final_path)
 
         manifest["chapters"].append(
             {
@@ -386,6 +434,16 @@ async def main() -> None:
                 "postprocess": postprocess,
             }
         )
+
+    complete_audio = None
+    complete_method = None
+    if not args.dry_run:
+        complete_path = out_dir / f"{block}-completo.mp3"
+        complete_method = create_complete_audio(chapter_audio_files, complete_path)
+        complete_audio = complete_path.name
+
+    manifest["complete_audio"] = complete_audio
+    manifest["complete_method"] = complete_method
 
     (out_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
