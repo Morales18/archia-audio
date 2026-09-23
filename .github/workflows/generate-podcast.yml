@@ -5,6 +5,7 @@ on:
     paths:
       - "requests/*.json"
       - "scripts/generate_audio.py"
+      - "config/technical_terms.json"
       - "requirements.txt"
   workflow_dispatch:
     inputs:
@@ -19,6 +20,10 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    env:
+      AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+      AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,6 +53,15 @@ jobs:
           test -f "$REQUEST"
           echo "path=$REQUEST" >> "$GITHUB_OUTPUT"
           echo "Using request: $REQUEST"
+
+      - name: Show provider availability
+        shell: bash
+        run: |
+          if [ -n "$AZURE_SPEECH_KEY" ] && [ -n "$AZURE_SPEECH_REGION" ]; then
+            echo "Azure Speech credentials detected: Azure will be the primary provider."
+          else
+            echo "Azure Speech credentials not configured: Edge TTS fallback will be used."
+          fi
 
       - name: Generate MP3
         run: python scripts/generate_audio.py "${{ steps.request.outputs.path }}"
